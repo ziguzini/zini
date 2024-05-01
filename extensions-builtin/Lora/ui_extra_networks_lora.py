@@ -14,6 +14,7 @@ class ExtraNetworksPageLora(ui_extra_networks.ExtraNetworksPage):
 
     def refresh(self):
         networks.list_available_networks()
+        super().refresh()
 
     def create_item(self, name, index=None, enable_filter=True):
         lora_on_disk = networks.available_networks.get(name)
@@ -43,10 +44,10 @@ class ExtraNetworksPageLora(ui_extra_networks.ExtraNetworksPage):
         self.read_user_metadata(item)
         activation_text = item["user_metadata"].get("activation text")
         preferred_weight = item["user_metadata"].get("preferred weight", 0.0)
-        item["prompt"] = quote_js(f"<lora:{alias}:") + " + " + (str(preferred_weight) if preferred_weight else "opts.extra_networks_default_multiplier") + " + " + quote_js(">")
-
+        prompt = f"<lora:{alias}:{str(preferred_weight) if preferred_weight else shared.opts.extra_networks_default_multiplier}>"
         if activation_text:
-            item["prompt"] += " + " + quote_js(" " + activation_text)
+            prompt += f" {activation_text}"
+        item["prompt"] = quote_js(prompt)
 
         negative_prompt = item["user_metadata"].get("negative text")
         item["negative_prompt"] = quote_js("")
